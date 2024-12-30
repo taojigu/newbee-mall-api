@@ -28,11 +28,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17' # Change to your project's Java version
+          cache: maven
 
       # Step 3: Build the Spring Boot application
-      - name: Build Spring Boot Application
-        run: |
-          ./mvnw clean install
+      - name: Build with Maven
+        run: mvn clean package -DskipTests --file pom.xml
 
       # Step 4: Start the Spring Boot application
       - name: Start Spring Boot Application
