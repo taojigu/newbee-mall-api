@@ -52,6 +52,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: taojigu/newbee_api_test
+          ref: develop
+          path: newbee_api_test
           #token: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 7: Set up Python environment
@@ -71,4 +73,6 @@ jobs:
         env:
           API_URL: "http://localhost:28019"
         run: |
+          ls
+          cd newbee_api_test
           pytest --base-url="$API_URL" test/
