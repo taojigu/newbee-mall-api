@@ -66,6 +66,8 @@ jobs:
       - name: Install Python dependencies
         env:
           API_URL: "http://localhost:28019"
+          USERNAME: ${{ secrets.LOGIN_USER_NAME }}
+          PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
         run: |
           ls
           cd newbee_api_test
