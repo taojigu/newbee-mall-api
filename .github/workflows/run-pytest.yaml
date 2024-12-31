@@ -72,7 +72,7 @@ jobs:
           pwd
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest --api-base-url="$API_URL" test/
+          pytest --login-name="$USERNAME" --password="$PASSWORD" --api-base-url="$API_URL" test/
 
 
 #      # Step 9: Run API tests
