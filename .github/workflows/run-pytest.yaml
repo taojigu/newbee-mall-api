@@ -64,18 +64,22 @@ jobs:
 
       # Step 8: Install test dependencies
       - name: Install Python dependencies
+        env:
+          API_URL: "http://localhost:28019"
         run: |
           ls
           cd newbee_api_test
           pwd
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # Step 9: Run API tests
-      - name: Run API Tests
-        env:
-          API_URL: "http://localhost:28019"
-        run: |
-          pwd
-          cd newbee_api_test
           pytest --base-url="$API_URL" test/
+
+
+#      # Step 9: Run API tests
+#      - name: Run API Tests
+#        env:
+#          API_URL: "http://localhost:28019"
+#        run: |
+#          pwd
+#          cd newbee_api_test
+#          pytest --base-url="$API_URL" test/
