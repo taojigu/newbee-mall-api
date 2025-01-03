@@ -37,10 +37,12 @@ jobs:
       # Step 4: Start the Spring Boot application
       - name: Start Spring Boot Application
         run: |
-          java -jar target/*.jar &
+          java -Dspring.profiles.active=test  -Ddb.username="$DB_USERNAME" -Ddb.password="$DB_PASSWORD" -jar target/*.jar  &
           echo "Waiting for the service to start..."
           sleep 15 # Adjust this wait time based on your service startup time
         env:
+          DB_USERNAME: ${{secrets.DB_USERNAME}}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
           PORT: 28019
 
       # Step 5: Log the API URL
@@ -65,7 +67,7 @@ jobs:
       # Step 8: Install test dependencies
       - name: Install Python dependencies
         env:
-          API_URL: "http://backend-api-01.newbee.ltd/"
+          API_URL: "http://localhost:28019/ltd/newbee/mall/"
           USERNAME: ${{ secrets.LOGIN_USER_NAME }}
           PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
         run: |

@@ -1,0 +1,1 @@
+java  -Dspring.profiles.active=test  -Ddb.username=${{username}} -Ddb.password=${{passowrd}} -jar target/newbee-mall-api-3.0.0-SNAPSHOT.jar
