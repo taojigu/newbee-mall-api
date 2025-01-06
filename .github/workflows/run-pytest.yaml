@@ -1,0 +1,88 @@
+name: Deploy Spring Boot API and Run Tests
+on:
+  pull_request:
+    types: [ labeled ]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run_jobs: ${{ github.event.label.name == 'pytest'}} # && github.event.pull_request.merged == true }}
+    steps:
+      - name: Check if jobs should run
+        run: echo "Evaluated conditions ..."
+
+  deploy-and-test:
+    needs: setup
+    environment: test
+    if: needs.setup.outputs.should_run_jobs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the Spring Boot API repository
+      - name: Checkout Spring Boot repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Java environment
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+
+      # Step 3: Build the Spring Boot application
+      - name: Build with Maven
+        run: mvn clean package -DskipTests --file pom.xml
+
+      # Step 4: Start the Spring Boot application
+      - name: Start Spring Boot Application
+        run: |
+          java -jar target/*.jar &
+          echo "Waiting for the service to start..."
+          sleep 15 # Adjust this wait time based on your service startup time
+        env:
+          PORT: 28019
+
+      # Step 5: Log the API URL
+      - name: Log API URL
+        run: echo "API is running at http://localhost:28019"
+
+      # Step 6: Checkout Python API test repository
+      - name: Checkout Python API Test repository
+        uses: actions/checkout@v3
+        with:
+          repository: taojigu/newbee_api_test
+          ref: develop
+          path: newbee_api_test
+          #token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Step 8: Install test dependencies
+      - name: Install Python dependencies
+        env:
+          API_URL: "http://backend-api-01.newbee.ltd/"
+          USERNAME: ${{ secrets.LOGIN_USER_NAME }}
+          PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+        run: |
+          ls
+          cd newbee_api_test
+          pwd
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          echo "environment variables...: $USERNAME and $PASSWORD",
+          pytest --login-name="$USERNAME" --password="$PASSWORD" --api-base-url="$API_URL" test/
+
+
+#      # Step 9: Run API tests
+#      - name: Run API Tests
+#        env:
+#          API_URL: "http://localhost:28019"
+#        run: |
+#          pwd
+#          cd newbee_api_test
+#          pytest --base-url="$API_URL" test/
